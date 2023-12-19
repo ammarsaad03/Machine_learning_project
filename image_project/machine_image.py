@@ -14,7 +14,7 @@ from sklearn.utils import shuffle
 from sklearn.cluster import KMeans
 
 # Set the path to your dataset
-data_path = "cell_images"
+data_path = "cell images"
 
 # Function to load and preprocess image data
 def load_and_preprocess_images(dataset_dir, img_size=(64, 64)):
