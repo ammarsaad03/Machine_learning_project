@@ -14,7 +14,7 @@ from sklearn.utils import shuffle
 from sklearn.cluster import KMeans
 
 # Set the path to your dataset
-data_path = "image_project/cell images"
+data_path = r"images_project/cell images"
 
 # Function to load and preprocess image data
 def load_and_preprocess_images(dataset_dir, img_size=(64, 64)):
@@ -30,23 +30,24 @@ def load_and_preprocess_images(dataset_dir, img_size=(64, 64)):
         
         for image_name in class_images:
             image_path = os.path.join(class_path, image_name)
+            
             image = cv2.imread(image_path)
             
             # Resize image
             image = cv2.resize(image, img_size)
-            
+
             # Convert to grayscale
             image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            
+
             # Normalize pixel values
             image_normalized = image_gray / 255.0
-            
+
             # Extract HOG features
             hog_features = extract_hog_features(image_gray)
-            
+
             images.append(hog_features)
             labels.append(class_name)
-    
+
     # Encode labels
     labels_encoded = class_encoder.fit_transform(labels)
     
@@ -55,7 +56,7 @@ def load_and_preprocess_images(dataset_dir, img_size=(64, 64)):
 
 # Function to extract HOG features
 def extract_hog_features(image):
-    features, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True)
+    features, hog_image = hog(image, orientations=8, pixels_per_cell=(32,32), cells_per_block=(1, 1), visualize=True)
     return features
 
 # Function for data preprocessing
@@ -131,7 +132,7 @@ plt.show()
 
 
 # Apply PCA for dimensionality reduction
-num_components = 128
+num_components =32
 pca = PCA(n_components=num_components)
 X_train_pca = pca.fit_transform(X_train)
 X_test_pca = pca.transform(X_test)
@@ -168,7 +169,7 @@ kmeans_logreg_predictions = logreg_on_clusters.predict(X_test_pca)
 
 # Evaluate accuracy
 kmeans_logreg_accuracy = accuracy_score(y_test, kmeans_logreg_predictions)
-print(f"K-Means with Logistic Regression Accuracy: {kmeans_logreg_accuracy}")
+print(f"K-Means with Logistic Regression Accuracy: {kmeans_logreg_accuracy * 100:.2f}%")
 
 
 # Generate confusion matrix
