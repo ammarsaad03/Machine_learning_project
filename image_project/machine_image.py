@@ -1,5 +1,5 @@
 import os
-import cv2
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -12,9 +12,9 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 from tensorflow.keras.preprocessing import image
 from sklearn.utils import shuffle
 from sklearn.cluster import KMeans
-
+import cv2
 # Set the path to your dataset
-data_path = r"images_project/cell images"
+data_path = "image_project/cell images"
 
 # Function to load and preprocess image data
 def load_and_preprocess_images(dataset_dir, img_size=(64, 64)):
@@ -51,7 +51,7 @@ def load_and_preprocess_images(dataset_dir, img_size=(64, 64)):
     # Encode labels
     labels_encoded = class_encoder.fit_transform(labels)
     
-    return np.array(images), labels_encoded, class_encoder
+    return np.array(images), labels_encoded
 
 
 # Function to extract HOG features
@@ -59,21 +59,16 @@ def extract_hog_features(image):
     features, hog_image = hog(image, orientations=8, pixels_per_cell=(32,32), cells_per_block=(1, 1), visualize=True)
     return features
 
-# Function for data preprocessing
-def preprocess_data(images, labels, random_state=42):
-    # Shuffle the data
-    images, labels = shuffle(images, labels, random_state=random_state)
-
 
 # Load and preprocess a subset of images
-X, y, class_encoder = load_and_preprocess_images(data_path)
+X, y = load_and_preprocess_images(data_path)
 
 
 # Reshape HOG features to 1D array
 X = X.reshape(X.shape[0], -1)
 
 # Use a subset of your data for testing
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=43)
 
 
 # Feature scaling
@@ -143,7 +138,7 @@ silhouette_scores = []
 num_clusters_range = range(2, 11)  # Choose a range of clusters to try
 
 for num_clusters in num_clusters_range:
-    kmeans = KMeans(n_clusters=num_clusters, random_state=1111)
+    kmeans = KMeans(n_clusters=num_clusters, random_state=1111, n_init=10)
     cluster_labels = kmeans.fit_predict(X_train_pca)
     silhouette_avg = silhouette_score(X_train_pca, cluster_labels)
     silhouette_scores.append(silhouette_avg)
@@ -153,7 +148,7 @@ optimal_num_clusters = num_clusters_range[np.argmax(silhouette_scores)]
 print(f"Optimal Number of Clusters: {optimal_num_clusters}")
 
 # Train KMeans with the optimal number of clusters
-kmeans_optimal = KMeans(n_clusters=optimal_num_clusters, random_state=1111)
+kmeans_optimal = KMeans(n_clusters=optimal_num_clusters, random_state=1111, n_init=10)
 train_cluster_labels = kmeans_optimal.fit_predict(X_train_pca)
 
 
@@ -196,7 +191,7 @@ plt.show()
 # Plot the loss curve
 inertia_values = []
 for num_clusters in num_clusters_range:
-    kmeans = KMeans(n_clusters=num_clusters, random_state=1111)
+    kmeans = KMeans(n_clusters=num_clusters, random_state=1111, n_init=10)
     kmeans.fit(X_train_pca)
     inertia_values.append(kmeans.inertia_)
 
